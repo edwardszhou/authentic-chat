@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true
+  },
+  "tsc-alias": {
+    "verbose": true,
+    "resolveFullPaths": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/node_modules", "node_modules", "dist"]
+}

@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
-    "checkJs": true,
     "paths": {
       "@/*": ["src/*"]
     },
@@ -10,5 +9,6 @@
     "jsxImportSource": "react",
     "strict": true
   },
-  "exclude": ["eslint.config.js", "**/node_modules", "node_modules", "dist"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["**/node_modules", "node_modules", "dist"]
 }

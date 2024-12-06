@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --grayscale-00: #ffffff;
+    --grayscale-40: #c7c8cd;
+    --grayscale-60: #7a7a7a;
+    --grayscale-80: #292929;
+    --grayscale-100: #000000;
+    --grayscale-90: #111111;
+    --grayscale-70: #4d4d4d;
+    --grayscale-5: #e8e8e8;
+    --grayscale-25: #bcb8b8;
+    --green-light: #b6ffa7;
+    --green-medium: #64e949;
+    --green-dark: #1e9805;
+    --pink-light: #ffdbf1;
+    --pink-medium: #ff71c6;
+    --pink-dark: #ea38a2;
+    --yellow-light: #ffce5c;
+    --yellow-dark: #906500;
+    --blue-light: #b0e3ff;
+    --blue-dark: #0f87cb;
+    --orange-light: #ffcd94;
+    --orange-dark: #ac6f30;
+  }
+  @font-face {
+    font-family: 'ApfelGrotezk';
+    src:
+      local('ApfelGrotezk-Regular'),
+      url('./assets/fonts/ApfelGrotezk-Regular.woff2') format('woff2'),
+      url('./assets/fonts/ApfelGrotezk-Regular.otf') format('opentype');
+    font-display: swap;
+    font-weight: 100 400;
+  }
+  @font-face {
+    font-family: 'ApfelGrotezk';
+    src:
+      local('ApfelGrotezk-Mittel'),
+      url('./assets/fonts/ApfelGrotezk-Mittel.woff2') format('woff2'),
+      url('./assets/fonts/ApfelGrotezk-Mittel.otf') format('opentype');
+    font-display: swap;
+    font-weight: 500 600;
+  }
+  @font-face {
+    font-family: 'ApfelGrotezk';
+    src:
+      local('ApfelGrotezk-Fett'),
+      url('./assets/fonts/ApfelGrotezk-Fett.woff2') format('woff2'),
+      url('./assets/fonts/ApfelGrotezk-Fett.otf') format('opentype');
+    font-display: swap;
+    font-weight: 700 800;
+  }
+  @font-face {
+    font-family: 'ApfelGrotezk';
+    src:
+      local('ApfelGrotezk-Satt'),
+      url('./assets/fonts/ApfelGrotezk-Satt.woff2') format('woff2'),
+      url('./assets/fonts/ApfelGrotezk-Satt.otf') format('opentype');
+    font-display: swap;
+    font-weight: 900;
+  }
+
+  html {
+    font-family: 'ApfelGrotezk';
+    letter-spacing: -0.04em;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}

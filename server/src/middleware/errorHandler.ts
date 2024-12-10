@@ -1,6 +1,7 @@
 import { logEvents } from '@/middleware/logger';
+import type { Request, Response } from 'express';
 
-const errorHandler = (err, req, res) => {
+const errorHandler = (err: Error, req: Request, res: Response) => {
   logEvents(
     `${err.name}: ${err.message}\t${req.method}\t${req.url}\t${req.headers.origin}`,
     'errLog.log'
@@ -9,8 +10,7 @@ const errorHandler = (err, req, res) => {
 
   const status = res.statusCode ? res.statusCode : 500; // if status code doesn't yet exist, set to 500 (server error)
 
-  res.status(status);
-  res.json({ message: err.message });
+  res.status(status).json({ message: err.message });
 };
 
 export default errorHandler;

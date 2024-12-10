@@ -1,7 +1,9 @@
+import { RUNTIME_ENV } from '@/utils/env';
 import User from '@/models/User';
 import bcrypt from 'bcrypt';
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
+import { generateAccessToken, type UserPayload } from '@/utils/jwt';
 
 // @desc Login
 // @route POST /auth
@@ -10,36 +12,24 @@ const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: 'All fields are required' });
+    throw new Error('All fields are required');
   }
 
   const foundUser = await User.findOne({ username }).exec();
-  if (!foundUser) return res.status(401).json({ message: 'Unauthorized' });
+  if (!foundUser) throw new Error('Unauthorized');
 
   const match = await bcrypt.compare(password, foundUser.password);
 
-  if (!match) return res.status(401).json({ message: 'Unauthorized' });
+  if (!match) throw new Error('Unauthorized');
 
-  const accessToken = jwt.sign(
-    {
-      user: {
-        username: foundUser.username,
-        id: foundUser.id
-      }
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: '1m' }
-  );
-
+  const accessToken = generateAccessToken({ username, id: foundUser.id });
   const refreshToken = jwt.sign(
     {
       username: foundUser.username
     },
-    process.env.REFRESH_TOKEN_SECRET,
+    RUNTIME_ENV.JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
   );
-
-  // Save the refresh token with the User in the databse
   foundUser['refreshToken'] = refreshToken;
   foundUser.save();
 
@@ -47,7 +37,7 @@ const login = asyncHandler(async (req, res) => {
   res.cookie('jwt', refreshToken, {
     httpOnly: true, //accessible only by web server
     secure: true, //https - even though localhost is http, it is fine to keep this in development, it will work
-    sameSite: 'None', //cross-site cookie
+    sameSite: 'none', //cross-site cookie
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7-day cookie expiry: set to match refreshToken
   });
 
@@ -62,36 +52,22 @@ const refresh = asyncHandler(async (req, res) => {
   // do stuff
   const cookies = req.cookies;
 
-  if (!cookies?.jwt) return res.status(401).json({ message: 'Unauthorized' });
+  if (!cookies?.jwt) throw new Error('Unauthorized');
 
   const refreshToken = cookies.jwt;
 
   // Search the database for a user with the refreshToken that was sent via HttpOnly cookie
   const foundUser = await User.findOne({ refreshToken: refreshToken });
-  if (!foundUser) return res.status(403).json({ message: 'Forbidden' }); // No user found
+  if (!foundUser) throw new Error('Forbidden'); // No user found
 
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    asyncHandler(async (err, decoded) => {
-      // if error or the username that was recorded in the refreshToken does not match with the username of the user we searched for with the refreshToken (something could've been tampered with!)
-      if (err || foundUser.username !== decoded.username)
-        return res.status(403).json({ message: 'Forbidden' });
+  jwt.verify(refreshToken, RUNTIME_ENV.JWT_REFRESH_SECRET, function (err: any, decoded: any) {
+    // if error or the username that was recorded in the refreshToken does not match with the username of the user we searched for with the refreshToken
+    if (err || foundUser.username !== (decoded as UserPayload).username)
+      throw new Error('Forbidden');
 
-      const accessToken = jwt.sign(
-        {
-          user: {
-            username: foundUser.username,
-            id: foundUser.id
-          }
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '1m' }
-      );
-
-      res.json({ accessToken });
-    })
-  );
+    const accessToken = generateAccessToken;
+    res.json({ accessToken });
+  });
 });
 
 // @desc Logout - clears the cookie if it exists and deletes it from the associated User's doc in the db
@@ -100,14 +76,17 @@ const refresh = asyncHandler(async (req, res) => {
 const logout = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) {
-    return res.status(204).json({ message: 'Logout successful' });
+    res.status(204).json({ message: 'Logout successful' });
+    return;
   } // No content; request successful there was no jwt cookie
   const refreshToken = cookies.jwt;
   // Delete refreshToken in the database
   const foundUser = await User.findOne({ refreshToken: refreshToken });
-  foundUser.refreshToken = '';
-  foundUser.save();
-  res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true }); // you need to include the same options that were part of the cookie when you made it (all except maxAge)
+  if (foundUser) {
+    foundUser.refreshToken = '';
+    foundUser.save();
+  }
+  res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
   res.json({ message: 'Cookie cleared' });
 });
 

@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 
-import connectDB from '@/config/db';
+import connectDB from '@/utils/db';
 import * as http from 'http';
 import Express from 'express';
 import mongoose from 'mongoose';
@@ -20,7 +20,7 @@ import Sentiment from 'sentiment';
 
 config();
 const app = Express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 const sentiment = new Sentiment();
 // MIDDLEWARE

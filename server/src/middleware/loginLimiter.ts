@@ -1,7 +1,7 @@
 import { logEvents } from '@/middleware/logger';
-import rateLimit from 'express-rate-limit';
+import expressRateLimit from 'express-rate-limit';
 
-const loginLimiter = rateLimit({
+const loginLimiter = expressRateLimit({
   windowMs: 60 * 1000, // time limit for login: 1 minute
   max: 5, // limit each IP to 5 login requests per 'window' per minute
   message: {

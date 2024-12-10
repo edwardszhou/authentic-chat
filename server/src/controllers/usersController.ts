@@ -1,58 +1,51 @@
-import User from '@/models/User';
+import User, { UserSchemaFields, type TUser } from '@/models/User';
 import bcrypt from 'bcrypt';
+import type { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
+import type { Types } from 'mongoose';
 
-const UserSchemaFields = Object.freeze({
-  _id: Symbol('_id'),
-  username: Symbol('username'),
-  password: Symbol('password'),
-  stats: Symbol('stats')
-});
-
+enum PatchOperations {
+  replace = 'replace'
+}
 // @desc Get all users
 // @route GET /users
 // @access Private
-const getUser = asyncHandler(async (req, res) => {
+const getUser = asyncHandler(async (req: Request, res: Response) => {
   for (const field in req.query) {
-    if (field in UserSchemaFields === false)
-      return res.status(400).json({ message: `Invalid query field '${field}'` });
+    if (field in UserSchemaFields) throw new Error(`Invalid query field '${field}'`);
   }
 
   const users = await User.find(req.query).select('-password').lean(); // retrieves a User doc
   if (!users?.length) {
-    return res.status(400).json({ message: 'No users found' });
+    throw new Error('No users found');
   }
-  res.json(users);
+  res.status(200).json(users);
 });
 
 // @desc Create new user
 // @route POST /users
 // @access Private
-const createNewUser = asyncHandler(async (req, res) => {
+const createNewUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  // Confirm data (both username and password need to be in request body)
   if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password fields are required.' });
+    throw new Error('Username and password fields are required.');
   }
 
-  // Check for duplicates
   const duplicate = await User.findOne({ username }).lean().exec();
   if (duplicate) {
-    return res.status(409).json({ message: 'Duplicate username' });
+    throw new Error('Duplicate username.');
   }
 
-  // Hash password
-  const hashedPwd = await bcrypt.hash(password, 10); // hash and add 10 salt rounds to the password
-  const userObject = { username, password: hashedPwd, refreshToken: '' };
+  const hashedPwd = await bcrypt.hash(password, 10);
+  const userObject: TUser = { username, password: hashedPwd, refreshToken: '' };
 
-  // Create and store new user
   const user = await User.create(userObject);
+
   if (user) {
-    //created
     res.status(201).json({ message: `New user ${username} created` });
   } else {
-    res.status(400).json({ message: 'Invalid user data received.' });
+    throw new Error('Invalid user data received.');
   }
 });
 
@@ -63,22 +56,25 @@ const updateUser = asyncHandler(async (req, res) => {
   const { username, patches } = req.body;
   // Confirm data (at a minimum, id and username have to be in req body)
   if (!username || !patches) {
-    return res.status(400).json({ message: 'username and patches fields are required' });
+    throw new Error('Username and patches fields are required.');
   }
   const user = await User.findOne({ username }).exec(); // Get the actual specific User document we want to update and save by ID
-  if (!user) return res.status(400).json({ message: 'User not found' });
+  if (!user) throw new Error('User not found.');
 
   for (const patch of patches) {
     const { path, op, value } = patch;
     if (path in UserSchemaFields === false) {
-      return res.status(400).json({ message: 'Invalid patch path' });
+      throw new Error('Invalid patch path');
     }
     const { result, error } = await patchUser(user, op, path, value);
-    if (error) return res.status(400).json({ message: error });
-    user[path] = result;
+    if (error) {
+      throw new Error(error);
+    } else {
+      user[path as keyof TUser] = result!;
+    }
   }
   user.save();
-  res.json({ message: `Successfully patched ${username}` });
+  res.status(200).json({ message: `Successfully patched ${username}` });
 });
 
 // @desc Delete a user
@@ -87,44 +83,45 @@ const updateUser = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
   const { username } = req.body;
   if (!username) {
-    // Request must have an ID bc we need ID to find the User document to delete
-    return res.status(400).json({ message: 'username field Required' });
+    throw new Error('Username field required.');
   }
 
   const user = await User.findOne({ username }).exec();
   if (!user) {
-    // If no User document with requested ID
-    return res.status(400).json({ message: 'User not found' });
+    throw new Error('Username not found.');
   }
 
   await user.deleteOne().exec(); // deletes User document; result holds deleted user's information
-  res.json({});
+  res.status(200).json({});
 });
 
-const patchUser = async function (user, op, path, value) {
+const patchUser = async function (
+  user: TUser & { _id: Types.ObjectId },
+  op: PatchOperations,
+  path: UserSchemaFields,
+  value: string
+): Promise<{ result: string; error: undefined } | { result: undefined; error: string }> {
   switch (op) {
     // replace operation for username and password fields
     case 'replace':
-      if (typeof value !== 'string') return { error: 'Invalid patch value, must be a string' };
-
-      if (path === 'username') {
+      if (path === UserSchemaFields.username) {
         // Check for duplicate
         const duplicate = await User.findOne({ username: value }).lean().exec();
-        if (duplicate && duplicate?._id.toString() !== user._id) {
+        if (duplicate && duplicate?._id !== user._id) {
           // requested username already exists with a User document that is NOT our user; so a no no, we don't want two users w same username!
-          return { error: 'Invalid patch value, duplicate username' };
+          return { result: undefined, error: 'Invalid patch value, duplicate username' };
         }
-      } else if (path === 'password') {
+      } else if (path === UserSchemaFields.password) {
         value = await bcrypt.hash(value, 10);
       } else if (path !== 'refreshToken') {
         // if the path is not username, nor password, NOR refreshToken (there's nothing really to check hence why the condition is written like this)
-        return { error: 'Invalid path' };
+        return { result: undefined, error: 'Invalid path' };
       }
       break;
     default:
-      return { error: 'Invalid patch operation' };
+      return { result: undefined, error: 'Invalid patch operation' };
   }
-  return { result: value };
+  return { result: value, error: undefined };
 };
 
 export default {

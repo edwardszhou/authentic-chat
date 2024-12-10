@@ -1,6 +1,20 @@
 import mongoose from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
+export type TUser = {
+  username: string;
+  password: string;
+  refreshToken?: string;
+  profileImg?: string;
+};
+
+export enum UserSchemaFields {
+  username = 'username',
+  password = 'password',
+  refreshToken = 'refreshToken',
+  profileImg = 'profileImg'
+}
+
+const UserSchema = new mongoose.Schema<TUser>({
   username: {
     type: String,
     required: true,
@@ -11,18 +25,8 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  stats: Map,
-  refreshToken: String
+  refreshToken: String,
+  profileImg: String
 });
-
-/**
- * Search for user's templates by template name
- *
- * @param {String} name
- * @returns promise resolving to template document
- */
-// UserSchema.methods.getTemplateByName = function (name) {
-//   return Template.findOne({ parentUser: this._id, name: name });
-// };
 
 export default mongoose.model('User', UserSchema);

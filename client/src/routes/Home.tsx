@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<'login' | 'signup'>('login');
+  const [modalContent, setModalContent] = useState<'login' | 'signup'>('signup');
 
   return (
     <>

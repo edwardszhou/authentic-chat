@@ -1,10 +1,14 @@
-import { socket } from "@/lib/socket";
-import { useEffect, useRef, useState } from "react";
+import FaceDetection, { FaceDetectionHandle } from '@/components/webcam/Webcam';
+import { socket } from '@/lib/socket';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Messages() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messages, setMessages] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const faceDetectionRef = useRef<FaceDetectionHandle>(null);
+  const [webcamEnabled, setWebcamEnabled] = useState(false);
+  const [faceApiLoaded, setFaceApiLoaded] = useState(false);
 
   useEffect(() => {
     socket.connect();
@@ -14,12 +18,12 @@ export default function Messages() {
   }, []);
   useEffect(() => {
     function onConnect() {
-      console.log("connected!");
+      console.log('connected!');
       setIsConnected(true);
     }
 
     function onDisconnect() {
-      console.log("disconnected!");
+      console.log('disconnected!');
       setIsConnected(false);
     }
 
@@ -27,14 +31,14 @@ export default function Messages() {
       setMessages((previous) => [...previous, value]);
     }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("message", onMessage);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('message', onMessage);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("message", onMessage);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('message', onMessage);
     };
   }, []);
   return (
@@ -48,16 +52,21 @@ export default function Messages() {
         ))}
       </div>
       <input
-        className="border-black border"
+        className="border border-black"
         ref={inputRef}
       />
       <button
         onClick={() => {
-          if (inputRef.current?.value) socket.emit("message", inputRef.current.value);
+          if (inputRef.current?.value) socket.emit('message', inputRef.current.value);
         }}
       >
         Submit Message
       </button>
+      <FaceDetection
+        ref={faceDetectionRef}
+        setWebcamEnabled={setWebcamEnabled}
+        setFaceApiLoaded={setFaceApiLoaded}
+      />
     </div>
   );
 }

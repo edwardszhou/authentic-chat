@@ -1,18 +1,19 @@
 import jwt from 'jsonwebtoken';
-import { RUNTIME_ENV } from './env';
 
 export type UserPayload = {
   username: string;
   id: string;
+  firstName?: string;
+  lastName?: string;
 };
 
 export function generateAccessToken(userPayload: UserPayload) {
-  if (!RUNTIME_ENV.JWT_ACCESS_SECRET) throw new Error('JWT Secret Key is not defined');
+  if (!process.env.ACCESS_TOKEN_SECRET) throw new Error('JWT Secret Key is not defined');
   return jwt.sign(
     {
-      user: userPayload
+      ...userPayload
     },
-    RUNTIME_ENV.JWT_ACCESS_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: '1m' }
   );
 }

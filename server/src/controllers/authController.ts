@@ -1,4 +1,3 @@
-import { RUNTIME_ENV } from '@/utils/env';
 import User from '@/models/User';
 import bcrypt from 'bcrypt';
 import asyncHandler from 'express-async-handler';
@@ -19,15 +18,20 @@ const login = asyncHandler(async (req, res) => {
   if (!foundUser) throw new Error('Unauthorized');
 
   const match = await bcrypt.compare(password, foundUser.password);
-
   if (!match) throw new Error('Unauthorized');
 
-  const accessToken = generateAccessToken({ username, id: foundUser.id });
+  const accessToken = generateAccessToken({
+    username: foundUser.username,
+    id: foundUser.id,
+    firstName: foundUser.firstName,
+    lastName: foundUser.lastName
+  });
   const refreshToken = jwt.sign(
     {
-      username: foundUser.username
+      username: foundUser.username,
+      id: foundUser.id
     },
-    RUNTIME_ENV.JWT_REFRESH_SECRET,
+    process.env.REFRESH_TOKEN_SECRET!,
     { expiresIn: '7d' }
   );
   foundUser['refreshToken'] = refreshToken;
@@ -35,13 +39,12 @@ const login = asyncHandler(async (req, res) => {
 
   // Create secure cookie with refresh token
   res.cookie('jwt', refreshToken, {
-    httpOnly: true, //accessible only by web server
-    secure: true, //https - even though localhost is http, it is fine to keep this in development, it will work
-    sameSite: 'none', //cross-site cookie
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7-day cookie expiry: set to match refreshToken
   });
 
-  // Send accessToken containing username
   res.json({ accessToken });
 });
 
@@ -49,23 +52,25 @@ const login = asyncHandler(async (req, res) => {
 // @route GET /auth/refresh
 // @access Public - because access token has expired
 const refresh = asyncHandler(async (req, res) => {
-  // do stuff
   const cookies = req.cookies;
-
   if (!cookies?.jwt) throw new Error('Unauthorized');
 
   const refreshToken = cookies.jwt;
 
-  // Search the database for a user with the refreshToken that was sent via HttpOnly cookie
   const foundUser = await User.findOne({ refreshToken: refreshToken });
-  if (!foundUser) throw new Error('Forbidden'); // No user found
+  if (!foundUser) throw new Error('Forbidden');
 
-  jwt.verify(refreshToken, RUNTIME_ENV.JWT_REFRESH_SECRET, function (err: any, decoded: any) {
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, function (err: any, decoded: any) {
     // if error or the username that was recorded in the refreshToken does not match with the username of the user we searched for with the refreshToken
     if (err || foundUser.username !== (decoded as UserPayload).username)
-      throw new Error('Forbidden');
+      throw new Error('Unauthorized');
 
-    const accessToken = generateAccessToken;
+    const accessToken = generateAccessToken({
+      username: foundUser.username,
+      id: foundUser.id,
+      firstName: foundUser.firstName,
+      lastName: foundUser.lastName
+    });
     res.json({ accessToken });
   });
 });

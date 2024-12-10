@@ -113,9 +113,6 @@ const patchUser = async function (
         }
       } else if (path === UserSchemaFields.password) {
         value = await bcrypt.hash(value, 10);
-      } else if (path !== 'refreshToken') {
-        // if the path is not username, nor password, NOR refreshToken (there's nothing really to check hence why the condition is written like this)
-        return { result: undefined, error: 'Invalid path' };
       }
       break;
     default:

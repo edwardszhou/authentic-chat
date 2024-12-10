@@ -1,7 +1,11 @@
-import Layout from "@/Layout";
-import Home from "@/routes/Home";
-import Messages from "@/routes/Messages";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes } from 'react-router-dom';
+
+import Layout from '@/Layout';
+import Home from '@/routes/Home';
+import Messages from '@/routes/Messages';
+import MessagesLayout from '@/routes/MessagesLayout';
+import NotFound from '@/routes/NotFound';
+import RequireAuthLayout from '@/routes/RequireAuthLayout';
 
 function App() {
   return (
@@ -14,10 +18,6 @@ function App() {
           index
           element={<Home />}
         />
-        <Route
-          path="messages"
-          element={<Messages />}
-        />
         {/* <Route
           path="login"
           element={<Login />}
@@ -28,15 +28,11 @@ function App() {
         /> */}
 
         {/* Protected routes */}
-        {/* <Route element={<RequireAuth />}>
-          <Route element={<DashLayout />}>
+        <Route element={<RequireAuthLayout />}>
+          <Route element={<MessagesLayout />}>
             <Route
-              path="dash"
-              element={<DashHome />}
-            />
-            <Route
-              path="exercises"
-              element={<Exercises />}
+              path="messages"
+              element={<Messages />}
             />
           </Route>
         </Route>
@@ -44,7 +40,7 @@ function App() {
         <Route
           path="*"
           element={<NotFound />}
-        /> */}
+        />
       </Route>
     </Routes>
   );

@@ -47,7 +47,7 @@ export default function Home() {
       </nav>
       <main className="flex w-full max-w-full flex-col">
         <div className="h-28 w-full" />
-        <div className="mx-8 flex flex-wrap items-center justify-between gap-24 rounded-3xl bg-primary-light p-32 md:px-36 xl:px-48">
+        <div className="mx-8 flex flex-wrap items-center justify-between gap-24 rounded-3xl bg-primary-light p-32 shadow-md md:px-36 xl:px-48">
           <div className="flex w-[40rem] flex-col items-start gap-8">
             <h1 className="text-6xl font-black leading-[1.25] text-primary-dark lg:text-6xl lg:leading-[1.25]">
               Rediscover <span className="bg-primary-dark px-3 text-white">authenticity</span> in
@@ -90,7 +90,7 @@ export default function Home() {
             </h3>
           </div>
           <div className="grid h-fit grid-cols-3 grid-rows-1 flex-nowrap items-stretch gap-8">
-            <div className="flex h-full flex-col items-center gap-8 rounded-2xl bg-primary p-16 text-white shadow-xl transition-transform duration-300 hover:-translate-y-2">
+            <div className="flex h-full flex-col items-center gap-8 rounded-2xl bg-primary p-16 text-white shadow-lg transition-transform duration-300 hover:-translate-y-2">
               <CirclePlus
                 className="h-16 w-16 text-primary-dark"
                 size={64}
@@ -101,7 +101,7 @@ export default function Home() {
                 analysis of the message and the expression on the face of the sender.
               </p>
             </div>
-            <div className="flex h-full flex-col items-center gap-8 rounded-2xl bg-primary p-16 text-white shadow-xl transition-transform duration-300 hover:-translate-y-2">
+            <div className="flex h-full flex-col items-center gap-8 rounded-2xl bg-primary p-16 text-white shadow-lg transition-transform duration-300 hover:-translate-y-2">
               <Sparkles
                 className="h-16 w-16 text-primary-dark"
                 size={64}
@@ -112,7 +112,7 @@ export default function Home() {
                 message to best represent the sentiment of the sender.
               </p>
             </div>
-            <div className="flex h-full flex-col items-center gap-8 rounded-2xl bg-primary p-16 text-white shadow-xl transition-transform duration-300 hover:-translate-y-2">
+            <div className="flex h-full flex-col items-center gap-8 rounded-2xl bg-primary p-16 text-white shadow-lg transition-transform duration-300 hover:-translate-y-2">
               <LockKeyholeIcon
                 className="h-16 w-16 text-primary-dark"
                 size={64}

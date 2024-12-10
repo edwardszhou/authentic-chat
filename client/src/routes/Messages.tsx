@@ -1,4 +1,3 @@
-import FaceDetection, { FaceDetectionHandle } from '@/components/webcam/Webcam';
 import { socket } from '@/lib/socket';
 import { useEffect, useRef, useState } from 'react';
 
@@ -6,9 +5,6 @@ export default function Messages() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messages, setMessages] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const faceDetectionRef = useRef<FaceDetectionHandle>(null);
-  const [webcamEnabled, setWebcamEnabled] = useState(false);
-  const [faceApiLoaded, setFaceApiLoaded] = useState(false);
 
   useEffect(() => {
     socket.connect();
@@ -42,7 +38,7 @@ export default function Messages() {
     };
   }, []);
   return (
-    <div>
+    <div className="h-full min-w-0 flex-1 rounded-2xl bg-white p-8 shadow-lg">
       Connected: {`${isConnected}`}
       <br />
       <div>
@@ -62,11 +58,6 @@ export default function Messages() {
       >
         Submit Message
       </button>
-      <FaceDetection
-        ref={faceDetectionRef}
-        setWebcamEnabled={setWebcamEnabled}
-        setFaceApiLoaded={setFaceApiLoaded}
-      />
     </div>
   );
 }

@@ -81,6 +81,7 @@ const FaceDetection = forwardRef<
       faceapi.loadSsdMobilenetv1Model('/models')
     ]).then(() => {
       setFaceApiLoaded(true);
+      console.log('Face API loaded');
     });
   }, [setFaceApiLoaded]);
 

@@ -6,20 +6,20 @@
 @layer base {
   :root {
     --grayscale-00: 255 255 255;
-    --grayscale-20: 232 232 232;
+    --grayscale-20: 245 245 245;
     --grayscale-40: 199 200 205;
     --grayscale-60: 122 122 122;
     --grayscale-80: 31 31 31;
     --grayscale-100: 0 0 0;
-    --primary-light: 184 255 240;
-    --primary: 15 205 180;
+    --primary-light: 214 255 246;
+    --primary: 2 173 170;
     --primary-dark: 5 60 94;
     --secondary: 254 215 102;
     --destructive: var(--red-9);
     --destructive-foreground: var(--red-12);
   }
   html {
-    letter-spacing: -0.04em;
+    scroll-behavior: smooth;
   }
 }
 

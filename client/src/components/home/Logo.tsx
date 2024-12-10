@@ -1,10 +1,10 @@
-import cn from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 export default function Logo({ className }: { className?: string }) {
   return (
     <>
       <svg
-        className={cn("fill-primary", className)}
+        className={cn('fill-primary', className)}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 604.89 480.27"
       >

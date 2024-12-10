@@ -1,12 +1,10 @@
-import type { AuthAccess } from '@/contexts/AuthProvider';
 import useAuth from '@/hooks/useAuth';
 import { refreshToken } from '@/lib/auth';
 import { axiosPrivate } from '@/lib/axios';
-import { jwtDecode } from 'jwt-decode';
 import { useLayoutEffect } from 'react';
 
 const useAxiosPrivate = () => {
-  const { auth, setAuth } = useAuth();
+  const { auth, setAuthToken } = useAuth();
 
   useLayoutEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
@@ -29,13 +27,12 @@ const useAxiosPrivate = () => {
           prevRequest.sent = true;
           try {
             const accessToken = await refreshToken();
-            const payload = jwtDecode<Omit<AuthAccess, 'accessToken'>>(accessToken);
-            setAuth({ accessToken, ...payload });
+            setAuthToken(accessToken);
             prevRequest.headers.Authorization = `Bearer ${accessToken}`;
 
             return axiosPrivate(prevRequest); // making the request again
           } catch {
-            setAuth(null);
+            setAuthToken(null);
           }
         }
         return Promise.reject(error);
@@ -46,7 +43,7 @@ const useAxiosPrivate = () => {
       axiosPrivate.interceptors.request.eject(requestIntercept);
       axiosPrivate.interceptors.response.eject(responseIntercept);
     };
-  }, [auth, setAuth]);
+  }, [auth, setAuthToken]);
 
   return axiosPrivate;
 };

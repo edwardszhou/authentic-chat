@@ -26,7 +26,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
 // @route POST /users
 // @access Private
 const createNewUser = asyncHandler(async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { username, password, firstName, lastName } = req.body;
 
   if (!username || !password) {
     throw new Error('Username and password fields are required.');
@@ -38,7 +38,13 @@ const createNewUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const hashedPwd = await bcrypt.hash(password, 10);
-  const userObject: TUser = { username, password: hashedPwd, refreshToken: '' };
+  const userObject: TUser = {
+    username,
+    password: hashedPwd,
+    refreshToken: '',
+    firstName,
+    lastName
+  };
 
   const user = await User.create(userObject);
 

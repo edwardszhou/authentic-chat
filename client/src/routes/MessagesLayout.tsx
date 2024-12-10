@@ -1,14 +1,8 @@
-import type { FaceDetectionHandle } from '@/components/webcam/Webcam';
-import FaceDetection from '@/components/webcam/Webcam';
 import useAuth from '@/hooks/useAuth';
-import { useRef, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 export default function MessagesLayout() {
   const { auth } = useAuth();
-  const faceDetectionRef = useRef<FaceDetectionHandle>(null);
-  const [webcamEnabled, setWebcamEnabled] = useState(false);
-  const [faceApiLoaded, setFaceApiLoaded] = useState(false);
 
   return (
     <>
@@ -19,11 +13,6 @@ export default function MessagesLayout() {
         </aside>
         <Outlet />
       </main>
-      <FaceDetection
-        ref={faceDetectionRef}
-        setWebcamEnabled={setWebcamEnabled}
-        setFaceApiLoaded={setFaceApiLoaded}
-      />
     </>
   );
 }

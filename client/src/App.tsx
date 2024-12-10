@@ -1,47 +1,47 @@
-import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import './globals.css';
+import Layout from "@/Layout";
+import Home from "@/routes/Home";
+import { Route, Routes } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    setCount(0);
-  }, []);
-
   return (
-    <>
-      <div>
-        <a
-          href="https://vite.dev"
-          target="_blank"
-        >
-          <img
-            src={reactLogo}
-            className="logo"
-            alt="Vite logo"
-          />
-        </a>
-        <a
-          href="https://react.dev"
-          target="_blank"
-        >
-          <img
-            src={reactLogo}
-            className="logo react"
-            alt="React logo"
-          />
-        </a>
-      </div>
-      <h1 className="text-blue-dark bg-grayscale-0 text-xl">Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <Routes>
+      <Route
+        path="/"
+        element={<Layout />}
+      >
+        <Route
+          index
+          element={<Home />}
+        />
+        {/* <Route
+          path="login"
+          element={<Login />}
+        />
+        <Route
+          path="sign-up"
+          element={<SignUp />}
+        /> */}
+
+        {/* Protected routes */}
+        {/* <Route element={<RequireAuth />}>
+          <Route element={<DashLayout />}>
+            <Route
+              path="dash"
+              element={<DashHome />}
+            />
+            <Route
+              path="exercises"
+              element={<Exercises />}
+            />
+          </Route>
+        </Route>
+
+        <Route
+          path="*"
+          element={<NotFound />}
+        /> */}
+      </Route>
+    </Routes>
   );
 }
 

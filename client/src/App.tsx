@@ -1,5 +1,6 @@
 import Layout from "@/Layout";
 import Home from "@/routes/Home";
+import Messages from "@/routes/Messages";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
@@ -12,6 +13,10 @@ function App() {
         <Route
           index
           element={<Home />}
+        />
+        <Route
+          path="messages"
+          element={<Messages />}
         />
         {/* <Route
           path="login"

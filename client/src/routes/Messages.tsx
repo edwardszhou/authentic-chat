@@ -1,8 +1,8 @@
-import FaceDetection, { type FaceDetectionHandle } from '@/components/webcam/Webcam';
+import ChatContext from '@/contexts/ChatProvider';
 import { socket } from '@/lib/socket';
 import { cn } from '@/lib/utils';
 import { ArrowUp } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 type Message = {
   message: string;
@@ -13,20 +13,19 @@ export default function Messages() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messages, setMessages] = useState<Message[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { startWebcam, getFaceEmotion, webcamEnabled, faceApiLoaded } = useContext(ChatContext);
 
-  const faceDetectionRef = useRef<FaceDetectionHandle>(null);
-  const [webcamEnabled, setWebcamEnabled] = useState(false);
-  const [faceApiLoaded, setFaceApiLoaded] = useState(false);
+  useEffect(() => {
+    if (!webcamEnabled) startWebcam();
+  }, [startWebcam, webcamEnabled]);
 
   useEffect(() => {
     socket.connect();
-    if (faceDetectionRef.current) {
-      faceDetectionRef.current.startWebcam();
-    }
     return () => {
       socket.disconnect();
     };
   }, []);
+
   useEffect(() => {
     function onConnect() {
       console.log('connected!');
@@ -54,9 +53,9 @@ export default function Messages() {
   }, []);
 
   async function handleEnter() {
-    if (inputRef.current && inputRef.current.value && faceDetectionRef.current) {
-      const expressions = await faceDetectionRef.current?.getEmotion();
-      console.log(expressions);
+    if (inputRef.current) {
+      const expressions = await getFaceEmotion();
+      if (expressions) console.log(expressions);
       const message = inputRef.current.value;
       socket.emit('message', inputRef.current.value);
       setMessages((previous) => [...previous, { message, sender: 'You' }]);
@@ -99,16 +98,15 @@ export default function Messages() {
               if (e.key === 'Enter') handleEnter();
             }}
           />
-          <button onClick={handleEnter}>
+          <button
+            onClick={handleEnter}
+            disabled={!webcamEnabled || !faceApiLoaded}
+            className="disabled:opacity-50"
+          >
             <ArrowUp className="h-full w-full rounded-full bg-primary stroke-white stroke-[3px] p-1" />
           </button>
         </div>
       </div>
-      <FaceDetection
-        ref={faceDetectionRef}
-        setWebcamEnabled={setWebcamEnabled}
-        setFaceApiLoaded={setFaceApiLoaded}
-      />
     </>
   );
 }

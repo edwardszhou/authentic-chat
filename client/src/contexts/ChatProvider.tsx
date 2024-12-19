@@ -1,27 +1,44 @@
-import { createContext, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
+import type { FaceDetectionHandle } from '@/components/webcam/Webcam';
+import FaceDetection from '@/components/webcam/Webcam';
+import type { FaceExpressions } from 'face-api.js';
+import { createContext, useCallback, useRef, useState, type ReactNode } from 'react';
 
 const ChatContext = createContext<{
   webcamEnabled: boolean;
-  setWebcamEnabled: Dispatch<SetStateAction<boolean>>;
   faceApiLoaded: boolean;
-  setFaceApiLoaded: Dispatch<SetStateAction<boolean>>;
+  startWebcam: () => void;
+  getFaceEmotion: () => Promise<FaceExpressions | undefined> | void;
 }>({
   webcamEnabled: false,
-  setWebcamEnabled: () => {},
   faceApiLoaded: false,
-  setFaceApiLoaded: () => {}
+  startWebcam: () => {},
+  getFaceEmotion: () => {}
 });
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [webcamEnabled, setWebcamEnabled] = useState(false);
   const [faceApiLoaded, setFaceApiLoaded] = useState(false);
+  const faceDetectionRef = useRef<FaceDetectionHandle>(null);
+
+  const startWebcam = useCallback(() => {
+    if (faceDetectionRef.current) faceDetectionRef.current.startWebcam();
+  }, []);
+
+  const getFaceEmotion = useCallback(async () => {
+    return await faceDetectionRef.current?.getEmotion();
+  }, []);
 
   return (
-    <ChatContext.Provider
-      value={{ webcamEnabled, setWebcamEnabled, faceApiLoaded, setFaceApiLoaded }}
-    >
-      {children}
-    </ChatContext.Provider>
+    <>
+      <ChatContext.Provider value={{ webcamEnabled, faceApiLoaded, startWebcam, getFaceEmotion }}>
+        {children}
+      </ChatContext.Provider>
+      <FaceDetection
+        ref={faceDetectionRef}
+        setWebcamEnabled={setWebcamEnabled}
+        setFaceApiLoaded={setFaceApiLoaded}
+      />
+    </>
   );
 }
 

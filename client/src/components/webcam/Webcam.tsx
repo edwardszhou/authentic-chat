@@ -60,20 +60,6 @@ const FaceDetection = forwardRef<
     }),
     [mediaStream, setWebcamEnabled]
   );
-  const startWebcam = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      setMediaStream(stream);
-      setWebcamEnabled(true);
-    } catch (error) {
-      console.error('Error accessing webcam', error);
-    }
-  };
 
   useEffect(() => {
     Promise.all([

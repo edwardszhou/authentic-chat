@@ -1,3 +1,4 @@
+import WebcamPopup from '@/components/webcam/WebcamPopup';
 import { ChatProvider } from '@/contexts/ChatProvider';
 import useAuth from '@/hooks/useAuth';
 import { Outlet } from 'react-router-dom';
@@ -13,6 +14,7 @@ export default function MessagesLayout() {
           <br /> {`${auth?.firstName} ${auth?.lastName}`}
         </aside>
         <Outlet />
+        <WebcamPopup />
       </main>
     </ChatProvider>
   );

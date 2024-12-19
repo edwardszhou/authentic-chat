@@ -13,11 +13,7 @@ export default function Messages() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messages, setMessages] = useState<Message[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { startWebcam, getFaceEmotion, webcamEnabled, faceApiLoaded } = useContext(ChatContext);
-
-  useEffect(() => {
-    if (!webcamEnabled) startWebcam();
-  }, [startWebcam, webcamEnabled]);
+  const { getFaceEmotion, faceApiLoaded } = useContext(ChatContext);
 
   useEffect(() => {
     socket.connect();
@@ -100,7 +96,7 @@ export default function Messages() {
           />
           <button
             onClick={handleEnter}
-            disabled={!webcamEnabled || !faceApiLoaded}
+            disabled={!faceApiLoaded}
             className="disabled:opacity-50"
           >
             <ArrowUp className="h-full w-full rounded-full bg-primary stroke-white stroke-[3px] p-1" />

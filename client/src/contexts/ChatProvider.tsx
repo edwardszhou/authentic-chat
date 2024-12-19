@@ -6,7 +6,7 @@ import { createContext, useCallback, useRef, useState, type ReactNode } from 're
 const ChatContext = createContext<{
   webcamEnabled: boolean;
   faceApiLoaded: boolean;
-  startWebcam: () => void;
+  startWebcam: () => Promise<void> | void;
   getFaceEmotion: () => Promise<FaceExpressions | undefined> | void;
 }>({
   webcamEnabled: false,
@@ -20,8 +20,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [faceApiLoaded, setFaceApiLoaded] = useState(false);
   const faceDetectionRef = useRef<FaceDetectionHandle>(null);
 
-  const startWebcam = useCallback(() => {
-    if (faceDetectionRef.current) faceDetectionRef.current.startWebcam();
+  const startWebcam = useCallback(async () => {
+    if (faceDetectionRef.current) await faceDetectionRef.current.startWebcam();
   }, []);
 
   const getFaceEmotion = useCallback(async () => {

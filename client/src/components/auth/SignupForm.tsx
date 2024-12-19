@@ -38,7 +38,7 @@ function SignUpForm({ className }: { className?: string }) {
   const { setAuthToken } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/dash';
+  const from = location.state?.from?.pathname || '/messages';
 
   const { formState, handleSubmit, register, watch, setError } = useForm<SignupFormValues>({
     resolver: zodResolver(SignupFormSchema),
@@ -106,7 +106,6 @@ function SignUpForm({ className }: { className?: string }) {
         <div className="flex w-full flex-1 flex-col gap-4">
           <input
             placeholder="Username"
-            id="username"
             className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
             {...register('username', {
               required: {
@@ -117,7 +116,6 @@ function SignUpForm({ className }: { className?: string }) {
           />
           <input
             placeholder="Password"
-            id="password"
             className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
             type="password"
             {...register('password', {
@@ -130,7 +128,6 @@ function SignUpForm({ className }: { className?: string }) {
           <input
             placeholder="Confirm password"
             className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
-            id="confirm"
             type="password"
             {...register('confirm')}
           />
@@ -138,13 +135,11 @@ function SignUpForm({ className }: { className?: string }) {
             <input
               placeholder="First name"
               className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
-              id="firstName"
               {...register('firstName')}
             />
             <input
               placeholder="Last name"
               className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
-              id="lastName"
               {...register('lastName')}
             />
           </div>

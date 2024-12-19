@@ -21,7 +21,7 @@ export default function LoginForm({ className }: { className?: string }) {
   const { setAuthToken } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/messages';
 
   const { formState, handleSubmit, register, setError, setFocus, resetField } =
     useForm<LoginFormValues>({
@@ -76,7 +76,6 @@ export default function LoginForm({ className }: { className?: string }) {
       >
         <div className="flex w-full flex-1 flex-col gap-4">
           <input
-            id="username"
             placeholder="Username"
             className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
             {...register('username', {
@@ -87,7 +86,6 @@ export default function LoginForm({ className }: { className?: string }) {
             })}
           />
           <input
-            id="password"
             placeholder="Password"
             className="w-full rounded-2xl bg-grayscale-20 px-6 py-3 text-xl"
             type="password"

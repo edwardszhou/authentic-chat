@@ -11,10 +11,7 @@ export default function Home() {
   return (
     <>
       <nav className="fixed flex h-28 w-full items-center justify-between gap-8 bg-white/75 p-8 backdrop-blur-lg md:px-16 xl:px-32 2xl:px-48">
-        <div
-          id="hero"
-          className="flex items-center gap-2 text-4xl font-bold tracking-tight text-primary"
-        >
+        <div className="flex items-center gap-2 text-4xl font-bold tracking-tight text-primary">
           <Logo className="h-12" />
           <span>
             Authenti<span className="">Chat</span>

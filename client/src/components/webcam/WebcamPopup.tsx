@@ -8,11 +8,12 @@ export default function WebcamPopup() {
 
   const requestWebcam = async () => {
     setLoading(true);
-    await startWebcam();
+    const { error } = await startWebcam();
+    // TODO: Handle this error
+    if (error) console.error(error);
     setLoading(false);
   };
 
-  console.log(loading);
   return (
     <div
       className={cn(

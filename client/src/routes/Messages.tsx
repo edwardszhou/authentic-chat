@@ -50,8 +50,13 @@ export default function Messages() {
 
   async function handleEnter() {
     if (inputRef.current) {
-      const expressions = await getFaceEmotion();
-      if (expressions) console.log(expressions);
+      const { error, expressions } = await getFaceEmotion();
+      if (error != null) {
+        // TODO: handle this error
+        console.error(error);
+      } else {
+        console.log(expressions);
+      }
       const message = inputRef.current.value;
       socket.emit('message', inputRef.current.value);
       setMessages((previous) => [...previous, { message, sender: 'You' }]);
@@ -91,7 +96,7 @@ export default function Messages() {
             className="flex-1 rounded-xl border border-grayscale-40 bg-grayscale-20 p-2"
             ref={inputRef}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') handleEnter();
+              if (e.key === 'Enter' && !e.shiftKey) handleEnter();
             }}
           />
           <button

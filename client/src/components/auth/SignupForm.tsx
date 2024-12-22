@@ -1,6 +1,6 @@
 import useAuth from '@/hooks/useAuth';
 import axios from '@/lib/axios';
-import { apiRoutes } from '@/lib/routes';
+import { apiRoutes } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 

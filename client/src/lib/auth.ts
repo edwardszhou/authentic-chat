@@ -1,5 +1,5 @@
 import axios from '@/lib/axios';
-import { apiRoutes } from '@/lib/routes';
+import { apiRoutes } from '@/lib/constants';
 
 export const refreshToken = async () => {
   const response = await axios.get(apiRoutes.authRefresh, {

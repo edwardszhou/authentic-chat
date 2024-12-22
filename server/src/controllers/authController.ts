@@ -11,14 +11,14 @@ const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    throw new Error('All fields are required');
+    throw new Error('400 All fields are required');
   }
 
   const foundUser = await User.findOne({ username }).exec();
-  if (!foundUser) throw new Error('Unauthorized');
+  if (!foundUser) throw new Error('403 Unauthorized');
 
   const match = await bcrypt.compare(password, foundUser.password);
-  if (!match) throw new Error('Unauthorized');
+  if (!match) throw new Error('403 Unauthorized');
 
   const accessToken = generateAccessToken({
     username: foundUser.username,
@@ -53,17 +53,17 @@ const login = asyncHandler(async (req, res) => {
 // @access Public - because access token has expired
 const refresh = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) throw new Error('Unauthorized');
+  if (!cookies?.jwt) throw new Error('403 Unauthorized');
 
   const refreshToken = cookies.jwt;
 
   const foundUser = await User.findOne({ refreshToken: refreshToken });
-  if (!foundUser) throw new Error('Forbidden');
+  if (!foundUser) throw new Error('401 Forbidden');
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, function (err: any, decoded: any) {
     // if error or the username that was recorded in the refreshToken does not match with the username of the user we searched for with the refreshToken
     if (err || foundUser.username !== (decoded as UserPayload).username)
-      throw new Error('Unauthorized');
+      throw new Error('403 Unauthorized');
 
     const accessToken = generateAccessToken({
       username: foundUser.username,

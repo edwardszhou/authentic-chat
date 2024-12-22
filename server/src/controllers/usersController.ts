@@ -12,12 +12,12 @@ enum PatchOperations {
 // @access Private
 const getUser = asyncHandler(async (req: Request, res: Response) => {
   for (const field in req.query) {
-    if (field in UserSchemaFields) throw new Error(`Invalid query field '${field}'`);
+    if (field in UserSchemaFields) throw new Error(`400 Invalid query field '${field}'`);
   }
 
   const users = await User.find(req.query).select('-password').lean(); // retrieves a User doc
   if (!users?.length) {
-    throw new Error('No users found');
+    throw new Error('400 No users found');
   }
   res.status(200).json(users);
 });
@@ -29,12 +29,12 @@ const createNewUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, password, firstName, lastName } = req.body;
 
   if (!username || !password) {
-    throw new Error('Username and password fields are required.');
+    throw new Error('400 Username and password fields are required.');
   }
 
   const duplicate = await User.findOne({ username }).lean().exec();
   if (duplicate) {
-    throw new Error('Duplicate username.');
+    throw new Error('409 Duplicate username.');
   }
 
   const hashedPwd = await bcrypt.hash(password, 10);
@@ -51,7 +51,7 @@ const createNewUser = asyncHandler(async (req: Request, res: Response) => {
   if (user) {
     res.status(201).json({ message: `New user ${username} created` });
   } else {
-    throw new Error('Invalid user data received.');
+    throw new Error('400 Invalid user data received.');
   }
 });
 
@@ -62,15 +62,15 @@ const updateUser = asyncHandler(async (req, res) => {
   const { username, patches } = req.body;
   // Confirm data (at a minimum, id and username have to be in req body)
   if (!username || !patches) {
-    throw new Error('Username and patches fields are required.');
+    throw new Error('400 Username and patches fields are required.');
   }
   const user = await User.findOne({ username }).exec(); // Get the actual specific User document we want to update and save by ID
-  if (!user) throw new Error('User not found.');
+  if (!user) throw new Error('400 User not found.');
 
   for (const patch of patches) {
     const { path, op, value } = patch;
     if (path in UserSchemaFields === false) {
-      throw new Error('Invalid patch path');
+      throw new Error('400 Invalid patch path');
     }
     const { result, error } = await patchUser(user, op, path, value);
     if (error) {
@@ -89,12 +89,12 @@ const updateUser = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
   const { username } = req.body;
   if (!username) {
-    throw new Error('Username field required.');
+    throw new Error('400 Username field required.');
   }
 
   const user = await User.findOne({ username }).exec();
   if (!user) {
-    throw new Error('Username not found.');
+    throw new Error('400 Username not found.');
   }
 
   await user.deleteOne().exec(); // deletes User document; result holds deleted user's information
@@ -115,14 +115,14 @@ const patchUser = async function (
         const duplicate = await User.findOne({ username: value }).lean().exec();
         if (duplicate && duplicate?._id !== user._id) {
           // requested username already exists with a User document that is NOT our user; so a no no, we don't want two users w same username!
-          return { result: undefined, error: 'Invalid patch value, duplicate username' };
+          return { result: undefined, error: '400 Invalid patch value, duplicate username' };
         }
       } else if (path === UserSchemaFields.password) {
         value = await bcrypt.hash(value, 10);
       }
       break;
     default:
-      return { result: undefined, error: 'Invalid patch operation' };
+      return { result: undefined, error: '400 Invalid patch operation' };
   }
   return { result: value, error: undefined };
 };
